@@ -1,0 +1,155 @@
+out_to_console	yes
+
+out_to_x		no
+own_window		no
+background		no
+
+# Update interval in seconds
+update_interval	3.0
+
+# This is the number of times Conky will update before quitting.
+# Set to zero to run forever.
+total_run_times 0
+
+# Shortens units to a single character (kiB->k, GiB->G, etc.). Default is off.
+short_units 	yes
+
+# How strict should if_up be when testing an interface for being up?
+# The value is one of up, link or address, to check for the interface
+# being solely up, being up and having link or being up, having link
+# and an assigned IP address. 
+if_up_strictness address
+
+# Add spaces to keep things from moving about?  This only affects certain objects.
+# use_spacer should have an argument of left, right, or none
+use_spacer left
+
+pad_percents	3
+max_text_width	0
+
+# Force UTF8? note that UTF8 support required XFT
+override_utf8_locale no
+
+# number of cpu samples to average
+# set to 1 to disable averaging
+cpu_avg_samples 2
+
+# Stuff after 'TEXT' will be formatted on screen
+TEXT
+
+# JSON for i3bar
+
+[	
+	# Memory / CPU
+	{ "full_text" : "  ${mem} (${memperc}%)     ${cpu}%   |" },
+
+	# Display / Sound
+	${if_match ${exec xbacklight | cut -b -3} == 100}
+		{ "full_text" : "  ${exec xbacklight | cut -b -3}" },
+	${else}${if_match ${exec xbacklight | cut -b -3} < 100}
+		${if_match ${exec xbacklight | cut -b -3} >= 10}
+			{ "full_text" : "  ${exec xbacklight | cut -b -2}" },
+		${endif}
+	${else}${if_match ${exec xbacklight | cut -b -3} < 10}
+		{ "full_text" : "  ${exec xbacklight | cut -b -1}" },
+	${endif}
+	
+	${if_match "${exec amixer | grep "Front Left: Playback" | awk '{print $6}'}" == "[on]"}
+		{ "full_text" : "  ", "separator" : false, "separator_block_width" : 0 },
+	${else}
+		{ "full_text" : "    ", "separator" : false, "separator_block_width" : 0 },
+	${endif}
+
+	${if_match ${exec amixer | grep "Front Left: Playback" | awk '{print $5}' | cut -b -3 | cut -b 2-} < 10}
+		${if_match ${exec amixer | grep "Front Left: Playback" | awk '{print $5}' | cut -b -2 | cut -b 2-} <= 9}
+			{ "full_text" : "${exec amixer | grep "Front Left: Playback" | awk '{print $5}' | cut -b -2 | cut -b 2-}   |" }, 
+		${endif}
+	${else}${if_match "${exec amixer | grep "Front Left: Playback" | awk '{print $5}' | cut -b -4 | cut -b 2-}" == "100" }
+		{ "full_text" : "${exec amixer | grep "Front Left: Playback" | awk '{print $5}' | cut -b -4 | cut -b 2-}   |" }, 
+	${else}${if_match "${exec amixer | grep "Front Left: Playback" | awk '{print $5}' | cut -b -4 | cut -b 2-}" != "100" }
+		${if_match "${exec amixer | grep "Front Left: Playback" | awk '{print $5}' | cut -b -3 | cut -b 2-}" != "5%" }
+			${if_match "${exec amixer | grep "Front Left: Playback" | awk '{print $5}' | cut -b -3 | cut -b 2-}" != "0%" }
+				{ "full_text" : "${exec amixer | grep "Front Left: Playback" | awk '{print $5}' | cut -b -3 | cut -b 2-}   |" }, 
+		 	${endif}
+		${endif}
+	${endif}
+
+	# Battery
+	${if_match "${exec acpi -b | awk '{print $4}' | cut -b -1 | cut -b 1-}" == "1"}
+		${if_match "${exec acpi -b | awk '{print $4}' | cut -b -2 | cut -b 2-}" == "0"}
+			${if_match "${exec acpi -b | awk '{print $4}' | cut -b -3 | cut -b 3-}" == "0"}
+				{ "full_text" : ""  },
+			${endif}
+		${endif}
+	${endif}
+
+	${if_match ${exec acpi -b | awk '{print $4}' | cut -b -2 | cut -b 1-} >= 90}
+		${if_match "${exec acpi -b | awk '{print $4}' | cut -b -3 | cut -b 3-}" == "%"}
+			{ "full_text" : ""  },
+		${endif}
+	${endif}
+
+	${if_match ${exec acpi -b | awk '{print $4}' | cut -b -2} < 90}
+		${if_match ${exec acpi -b | awk '{print $4}' | cut -b -2} >= 65}
+			${if_match "${exec acpi -b | awk '{print $4}' | cut -b -3 | cut -b 3-}" == "%"}
+				{ "full_text" : ""  },
+			${endif}
+		${endif}
+	${endif}
+	
+	${if_match ${exec acpi -b | awk '{print $4}' | cut -b -2} < 65}
+		${if_match ${exec acpi -b | awk '{print $4}' | cut -b -2} >= 30}
+			${if_match "${exec acpi -b | awk '{print $4}' | cut -b -3 | cut -b 3-}" == "%"}
+				{ "full_text" : ""  },
+			${endif}
+		${endif}
+	${endif}
+	
+	${if_match ${exec acpi -b | awk '{print $4}' | cut -b -2} < 30}
+		${if_match ${exec acpi -b | awk '{print $4}' | cut -b -2} >= 10}
+			${if_match "${exec acpi -b | awk '{print $4}' | cut -b -3 | cut -b 3-}" == "%"}
+				{ "full_text" : ""  },
+			${endif}
+		${endif}
+	${endif}
+
+	${if_match "${exec acpi -b | awk '{print $4}' | cut -b -2 | cut -b 2-}" == "%"}
+		{ "full_text" : ""  },
+	${endif}
+
+	${if_match "${exec acpi -a | cut -b 12-}" == "on-line"}
+		{ "full_text" : ""  },
+	${endif}
+
+	${if_match "${exec acpi -b | awk '{print $5}' | cut -b -5}" != ""}
+		{ "full_text" : "${exec acpi -b | awk '{print $5}' | cut -b -5}   |" },
+	${else}
+		{ "full_text" : "|" },
+	${endif}
+	
+	# Network
+	${if_up enp7s0}
+		{ "full_text" : "     ${downspeedf enp7s0}KiB  ${upspeedf enp7s0}KiB   |" },
+	${else}
+		${if_up enp0s20u3}
+			{ "full_text" : "     ${downspeedf enp0s20u3}KiB  ${upspeedf enp0s20u3}KiB   |" },
+		${else}
+			${if_up enp0s20u2}
+				{ "full_text" : "     ${downspeedf enp0s20u2}KiB  ${upspeedf enp0s20u2}KiB   |" },
+			${else}
+				${if_up enp0s20u1}
+					{ "full_text" : "     ${downspeedf enp0s20u1}KiB  ${upspeedf enp0s20u1}KiB   |" },
+				${else}
+					${if_up wlp19s0}
+						{ "full_text" : "     ${downspeedf enp0s20u1}KiB  ${upspeedf enp0s20u1}KiB   |" },
+					${else}
+						{ "full_text" : "  Keine Verbindung   |" },
+					${endif}
+				${endif}
+			${endif}
+		${endif}
+	${endif}
+
+	# Date / Time
+	{ "full_text" : "  ${time %a %d %b}     ${time %H:%M}   " }
+],
